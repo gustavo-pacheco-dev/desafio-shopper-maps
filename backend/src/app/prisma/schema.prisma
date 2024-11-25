@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+  seed     = "ts-node ./seed.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// TABELAS (MODELS)
+model Customers {
+  customer_id String   @id @default(uuid())
+  cpf         String?  @unique
+  name        String?
+  createdAt   DateTime @default(now())
+  rides       Rides[] // Relacionamento com Rides [N rides : 1 customer]
+}
+
+model Rides {
+  ride_id     Int      @id @default(autoincrement())
+  customer_id String
+  origin      String
+  destination String
+  distance    Float
+  duration    String
+  driver_id   Int
+  driver_name String
+  value       Float
+  createdAt   DateTime @default(now())
+  rating      Ratings? // Relacionamento com Ratings [1 ride : 1 rating]
+
+  customer Customers @relation(fields: [customer_id], references: [customer_id])
+  driver   Drivers   @relation(fields: [driver_id], references: [driver_id])
+}
+
+model Drivers {
+  driver_id    Int       @id @default(autoincrement())
+  cpf          String?   @unique
+  name         String?
+  description  String
+  vehicle      String
+  price_per_km Float
+  min_km       Int
+  createdAt    DateTime  @default(now())
+  rides        Rides[] // Relacionamento com Rides [N rides : 1 driver]
+  ratings      Ratings[] // Relacionamento com Ratings [N ratings : 1 driver]
+}
+
+model Ratings {
+  id          Int      @id @default(autoincrement())
+  ride_id     Int      @unique
+  driver_id   Int
+  customer_id String
+  rating      Int
+  comment     String
+  createdAt   DateTime @default(now())
+
+  ride   Rides   @relation(fields: [ride_id], references: [ride_id])
+  driver Drivers @relation(fields: [driver_id], references: [driver_id])
+}

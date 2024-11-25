@@ -1,0 +1,48 @@
+services:
+  # Serviço do banco de dados PostgreSQL
+  db:
+    image: postgres
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: taxi
+      POSTGRES_PASSWORD: desafioshopper
+      POSTGRES_DB: taxi_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Serviço da API (backend)
+  api:
+    build: ./backend # Caminho para o diretório com o código da API
+    container_name: api-container
+    env_file:
+      - .env # Especifica o arquivo de variáveis de ambiente na raiz do projeto
+    ports:
+      - "8080:8080" # Porta onde a API estará rodando
+    depends_on:
+      - db # A API depende do banco de dados estar rodando
+    networks:
+      - app-network
+    volumes:
+      - ./backend/src:/app/src # Volumes para código da API
+    command: >
+      sh -c "
+        until pg_isready -h db -p 5432; do
+          echo 'Esperando o banco de dados estar pronto...';
+          sleep 2;
+        done;
+        npx prisma db push --schema=/app/src/app/prisma/schema.prisma &&
+        npx ts-node /app/src/app/prisma/seed.ts &&
+        npm run start
+      "
+
+volumes:
+  postgres-data:
+
+
+networks:
+  app-network:
+    driver: bridge

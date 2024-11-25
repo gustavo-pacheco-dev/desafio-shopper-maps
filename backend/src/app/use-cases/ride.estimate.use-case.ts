@@ -1,15 +1,16 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { Drivers } from '@prisma/client';
 
 import { getDrivers } from '../services/driver.service';
 
 
 type RoutesApiRequestHeader = AxiosRequestConfig['headers']
 
-type RoutesApiRequestBody = {
-  "origin":{
+interface RoutesApiRequestBody {
+  "origin": {
     "address": string
   },
-  "destination":{
+  "destination": {
     "address": string
   },
   "travelMode": string,
@@ -24,31 +25,31 @@ type RoutesApiRequestBody = {
   "units": string
 }
 
-type RoutesApiResponseBody = {
+interface RoutesApiResponseBody {
   "routes": [
-      {
-          "legs": [
-              {
-                  "startLocation": {
-                      "latLng": {
-                          "latitude": number,
-                          "longitude": number
-                      }
-                  },
-                  "endLocation": {
-                      "latLng": {
-                          "latitude": number,
-                          "longitude": number
-                      }
-                  }
-              }
-          ],
-          "distanceMeters": number,
-          "duration": string,
-          "polyline": {
-              "encodedPolyline": string
+    {
+      "legs": [
+        {
+          "startLocation": {
+            "latLng": {
+              "latitude": number,
+              "longitude": number
+            }
+          },
+          "endLocation": {
+            "latLng": {
+              "latitude": number,
+              "longitude": number
+            }
           }
+        }
+      ],
+      "distanceMeters": number,
+      "duration": string,
+      "polyline": {
+        "encodedPolyline": string
       }
+    }
   ]
 }
 
@@ -70,7 +71,7 @@ export const estimateRideUseCase = async ({
       "X-Goog-Api-Key": routesAPIKey, // Chave da API
       "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline,routes.legs.startLocation,routes.legs.endLocation",
     };
-    
+
     // Definindo o body da requisição
     const requestBody: RoutesApiRequestBody = {
       origin: {
@@ -95,11 +96,11 @@ export const estimateRideUseCase = async ({
     const response = await axios.post(apiUrl, requestBody, {
       headers: requestHeaders,
     });
-    
+
     // Obtendo os dados da response da API
     const data: RoutesApiResponseBody = response.data;
     const routeResponse = data; // Resposta original da rota no Google Maps
-    
+
     const route = data.routes[0]; // Obtendo a primeira rota
     const leg = route.legs[0]; // Obtendo apenas a primeira etapa da rota para obter as coordenadas da partida e do destino
 
@@ -107,20 +108,20 @@ export const estimateRideUseCase = async ({
     const destinationCoordinates = leg.endLocation.latLng; // Coordenadas do endereço de destino
     const distance = route.distanceMeters / 1000; // Distância em Km
     const duration = `${Math.ceil(parseInt(route.duration) / 60)} minutos`; // Duração da viagem em minutos
-    
-    const drivers = getDrivers(); // Obtendo os motoristas cadastrados
+
+    const drivers: Drivers[] = await getDrivers(); // Obtendo os motoristas cadastrados
 
     // Gerando as opções de motorista com seus preços
     const options = drivers
-      .filter((driver) => !(driver.minKm && distance < driver.minKm)) // Filtrando os motoristas por mínimo de quilômetros para uma viagem
+      .filter((driver) => !(driver.min_km && distance < driver.min_km)) // Filtrando os motoristas por mínimo de quilômetros para uma viagem
       .map((driver) => {
         // Removendo o atributo "minKm" para não retorná-lo na response
-        const { minKm, pricePerKm, ...rest } = driver
-        
+        const { min_km, price_per_km, ...rest } = driver
+
         // Calculando o preço do motorista e retornando o motorista sem o atributo "minKm"
         return {
           ...rest,
-          value: driver.pricePerKm * distance,
+          value: driver.price_per_km * distance,
         }
       })
       .sort((a, b) => a.value - b.value); // Ordenando o preço do menor para o maior
