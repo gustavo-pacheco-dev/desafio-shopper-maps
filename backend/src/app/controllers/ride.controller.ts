@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { estimateRideUseCase } from '../use-cases/ride.estimate.use-case';
 import { ConfirmRideInput, confirmRideUseCase } from '../use-cases/ride.confirm.use-case';
 import prisma from '../prisma/client';
+import { getRideUseCase } from '../use-cases/ride.get.use-case';
 
 
 export const estimateRideController = async (
@@ -69,7 +70,7 @@ export const confirmRideController = async (
     if (!customer_id_data || !origin_data || !destination_data || !driver.id || !driver.name || !value) {
       return res.status(400).send({
         error_code: 'INVALID_DATA',
-        error_description: 'Os dados fornecidos no corpo da requisição são inválidos.'
+        error_description: 'Os dados fornecidos no corpo da requisição são inválidos'
       });
     }
 
@@ -77,7 +78,7 @@ export const confirmRideController = async (
     if (origin_data === destination_data) {
       return res.status(400).send({
         error_code: 'INVALID_DATA',
-        error_description: 'O ponto de partida e o destino devem ser diferentes.'
+        error_description: 'O ponto de partida e o destino devem ser diferentes'
       });
     }
 
@@ -87,17 +88,17 @@ export const confirmRideController = async (
     });
 
     if (!selectedDriver) {
-      return res.status(400).send({
+      return res.status(404).send({
         error_code: 'DRIVER_NOT_FOUND',
-        error_description: 'Motorista não encontrado.',
+        error_description: 'Motorista não encontrado',
       });
     }
 
     // Verificar se a distância é válida para o motorista selecionado
     if (distance < selectedDriver.min_km) {
-      return res.status(400).send({
+      return res.status(406).send({
         error_code: 'INVALID_DISTANCE',
-        error_description: `Quilometragem inválida para o motorista.`,
+        error_description: `Quilometragem inválida para o motorista`,
       });
     }
 
@@ -115,3 +116,60 @@ export const confirmRideController = async (
     return res.status(400).send({ error: "Houve um erro ao confirmar sua viagem. Tente novamente." });
   }
 };
+
+export const getRidesController = async (
+  req: FastifyRequest,
+  res: FastifyReply
+) => {
+  const { customer_id } = req.params as { customer_id: string };
+  const { driver_id } = req.query as { driver_id?: string };
+
+  const customerIdData = customer_id.trim()
+  const driverIdNumber = Number(driver_id?.trim())
+
+  try {
+    // Verificar se o customer_id foi informado
+    if (!customerIdData) {
+      return res.status(400).send({
+        error_code: 'INVALID_DATA',
+        error_description: 'Erro! Por favor, informe o ID do cliente.',
+      });
+    }
+
+    if (driverIdNumber) {
+      // Buscando o motorista informado no banco de dados
+      const selectedDriver = await prisma.drivers.findUnique({
+        where: { driver_id: driverIdNumber },
+      });
+
+      if (!selectedDriver) {
+        return res.status(400).send({
+          error_code: 'INVALID_DRIVER',
+          error_description: 'Motorista invalido',
+        });
+      }
+    }
+
+    // Consultar os detalhes da viagem no banco de dados
+    const ridesDone = await getRideUseCase({
+      customer_id: customerIdData,
+      driver_id: driverIdNumber
+    });
+
+    if (ridesDone.rides.length == 0) {
+      return res.status(404).send({
+        error_code: 'NO_RIDES_FOUND',
+        error_description: 'Nenhum registro encontrado',
+      });
+    }
+
+    // Retornar os detalhes da viagem
+    return res.status(200).send(ridesDone);
+  } catch (error: any) {
+    console.error('Erro ao obter detalhes da viagem:', error);
+    return res.status(500).send({
+      error_code: 'INTERNAL_SERVER_ERROR',
+      error_description: 'Erro ao obter detalhes da viagem',
+    });
+  }
+}

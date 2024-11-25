@@ -14,7 +14,9 @@ model Customers {
   cpf         String?  @unique
   name        String?
   createdAt   DateTime @default(now())
-  rides       Rides[] // Relacionamento com Rides [N rides : 1 customer]
+
+  // "rides" deve ser um relacionamento com a tabela Rides, porém, apenas para questoes de praticidade na resolução do Desafio Shopper, o campo está apenas como comentário
+  // rides       Rides[] // Relacionamento com Rides [N rides : 1 customer]
 }
 
 model Rides {
@@ -30,8 +32,9 @@ model Rides {
   createdAt   DateTime @default(now())
   rating      Ratings? // Relacionamento com Ratings [1 ride : 1 rating]
 
-  customer Customers @relation(fields: [customer_id], references: [customer_id])
-  driver   Drivers   @relation(fields: [driver_id], references: [driver_id])
+  // O campo customer_id deve ser uma chave estrangeira (FK), porém, apenas para questoes de praticidade na resolução do Desafio Shopper, o campo está referenciado apenas como string
+  // customer Customers @relation(fields: [customer_id], references: [customer_id])
+  driver Drivers @relation(fields: [driver_id], references: [driver_id])
 }
 
 model Drivers {
