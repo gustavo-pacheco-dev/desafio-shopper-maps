@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Drivers } from '@prisma/client';
 
-import { getDrivers } from '../services/driver.service';
+import { getDriverReviews, getDrivers } from '../services/driver.service';
 
 
 type RoutesApiRequestHeader = AxiosRequestConfig['headers']
@@ -112,20 +112,31 @@ export const estimateRideUseCase = async ({
     const drivers: Drivers[] = await getDrivers(); // Obtendo os motoristas cadastrados
 
     // Gerando as opções de motorista com seus preços
-    const options = drivers
-      .filter((driver) => !(driver.min_km && distance < driver.min_km)) // Filtrando os motoristas por mínimo de quilômetros para uma viagem
-      .map((driver) => {
-        // Removendo o atributo "minKm" para não retorná-lo na response
-        const { min_km, price_per_km, ...rest } = driver
+    const options = await Promise.all(
+      drivers
+        .filter((driver) => !(driver.min_km && distance < driver.min_km)) // Filtrando os motoristas por mínimo de quilômetros para uma viagem
+        .map(async (driver) => {
 
-        // Calculando o preço do motorista e retornando o motorista sem o atributo "minKm"
-        return {
-          ...rest,
-          value: driver.price_per_km * distance,
-        }
-      })
-      .sort((a, b) => a.value - b.value); // Ordenando o preço do menor para o maior
+          // Removendo atributos para não retorná-los na response
+          const { cpf, min_km, price_per_km, driver_id, createdAt, ...rest } = driver
 
+          // Obtendo as avaliações do motorista para retornar a mais recente na response
+          const reviews = await getDriverReviews(driver_id)
+
+          // Calculando o preço do motorista e retornando o motorista sem o atributo "minKm"
+          return {
+            id: driver.driver_id,
+            ...rest,
+            review: {
+              rating: reviews[0]?.rating ?? null,
+              comment: reviews[0]?.comment ?? 'Sem avaliações'
+            },
+            value: driver.price_per_km * distance,
+          }
+        })
+    )
+
+    options.sort((a, b) => a.value - b.value); // Ordenando o preço do menor para o maior
     return {
       origin: originCoordinates,
       destination: destinationCoordinates,

@@ -1,0 +1,82 @@
+.card {
+    background-color: #D0BD5E;
+    width: 100%;
+    height: max-content;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 2rem;
+    color: #1E1E1E;
+    gap: 2rem;
+}
+
+.driverSection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.line {
+    background-color: #1E1E1E;
+    width: 1px;
+    height: auto;
+}
+
+.driverNameAndReview {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.nameAndDescription,
+.review {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.name,
+.rating {
+    font-weight: bold;
+    width: 100%;
+    font-size: 1.6rem;
+    text-align: start;
+}
+
+.review {
+    margin-top: 1.5rem;
+}
+
+.description,
+.comment {
+    font-weight: normal;
+    width: 100%;
+    text-align: start;
+    font-size: 1.2rem;
+}
+
+.carSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 0.6rem;
+}
+
+.vehicle {
+    font-weight: bold;
+    font-size: 1.15rem;
+}
+
+.value {
+    font-weight: bold;
+    font-size: 2rem;
+}
