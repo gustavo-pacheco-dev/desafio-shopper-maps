@@ -4,6 +4,7 @@ services:
     image: postgres
     container_name: postgres-container
     environment:
+      # As credenciais do Postgres estão expostas APENAS para fins de teste no Desafio Shopper
       POSTGRES_USER: taxi
       POSTGRES_PASSWORD: desafioshopper
       POSTGRES_DB: taxi_service
