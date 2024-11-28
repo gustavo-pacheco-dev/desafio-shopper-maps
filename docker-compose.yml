@@ -38,6 +38,21 @@ services:
         npx ts-node /app/src/app/prisma/seed.ts &&
         npm run start
       "
+  # Serviço do Frontend
+  frontend:
+    build: ./frontend/taxi-app # Caminho para o diretório do frontend
+    container_name: frontend-container
+    ports:
+      - "80:80" # Porta onde o frontend será servido
+    networks:
+      - app-network
+    volumes:
+      - ./frontend/taxi-app:/app # Sincroniza os arquivos do frontend com o container
+    env_file:
+      - .env
+    command: npm run dev # Inicia o servidor de desenvolvimento do Next.js
+    depends_on:
+      - api # O frontend depende da API estar rodando
 
 volumes:
   postgres-data:

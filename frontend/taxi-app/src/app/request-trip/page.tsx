@@ -37,7 +37,18 @@ interface GetRideEstimateApiResponse {
     distance: number,
     duration: string,
     options: Driver[],
-    routeResponse: object,
+    routeResponse: {
+        routes: [
+            {
+                polyline: {
+                    encodedPolyline: string;
+                    [key: string]: any;
+                }
+                [key: string]: any;
+            }
+        ]
+        [key: string]: any;
+    },
 }
 
 export interface LocalStorageTripData {

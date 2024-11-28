@@ -27,40 +27,17 @@
     margin-top: 3rem;
 }
 
-.tripOriginAndDestination {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.2rem;
-    width: 100%;
-    color: #FFCE54;
-    margin: 0.5rem 0rem;
-
-}
-
-.tripOriginAndDestination h1 {
-    font-size: 1.5rem;
-}
-
 .line {
     background-color: #FFCE54;
     width: 100%;
     height: 1px;
 }
 
-
-.chooseDriver {
+.searchOptions {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
-    margin: 1rem 0rem;
-}
-
-.chooseDriver h1 {
-    color: #FFCE54;
-    text-wrap: nowrap;
-    padding: 0rem 1rem;
+    gap: 1rem;
 }

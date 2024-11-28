@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { Driver, LocalStorageTripData } from "../request-trip/page"
 import styles from "./driverOptionCard.module.css";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface DriverOptionCardProps {
     driver: Driver;
@@ -29,6 +30,7 @@ interface ConfirmRideResponseBody {
 
 export default function DriverOptionCard({ driver, tripData }: DriverOptionCardProps) {
     const { customer_id, originText, destinationText, data } = tripData
+    const router = useRouter()
 
     const handleConfirmRide = async () => {
 
@@ -60,6 +62,7 @@ export default function DriverOptionCard({ driver, tripData }: DriverOptionCardP
 
             if (confirmRideResponse.success) {
                 alert("Viagem solicitada com sucesso!!")
+                router.push('/rides-history')
             } else {
                 throw new Error(confirmRideResponse.error_description);
             }

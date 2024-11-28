@@ -1,0 +1,78 @@
+.card {
+    background-color: #D0BD5E;
+    width: 100%;
+    height: max-content;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    padding: 2rem;
+    color: #1E1E1E;
+    gap: 2rem;
+}
+
+.rideSection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.line {
+    background-color: #1E1E1E;
+    width: 1px;
+    height: auto;
+}
+
+.rideInformation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.nameDiv,
+.dateDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.name {
+    font-weight: bold;
+    width: 100%;
+    font-size: 1.6rem;
+    text-align: start;
+}
+
+.date,
+.origin,
+.destination,
+.distance,
+.duration {
+    width: 100%;
+    font-size: 1.3rem;
+    text-align: start;
+}
+
+.dateDiv {
+    margin-top: 1.5rem;
+}
+
+.valueSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 0.6rem;
+}
+
+.value {
+    font-weight: bold;
+    font-size: 2rem;
+}

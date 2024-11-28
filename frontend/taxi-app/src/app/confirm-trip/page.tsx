@@ -7,6 +7,7 @@ import ArrowBack from "@mui/icons-material/ArrowBack"
 import { LocalStorageTripData } from "../request-trip/page";
 import styles from "./confirm_trip.module.css"
 import DriverOptionCard from "../components/DriverOptionCard";
+import MapComponent from "../components/MapComponent";
 
 
 export default function ConfirmTrip() {
@@ -27,7 +28,15 @@ export default function ConfirmTrip() {
             distance: 0,
             duration: "",
             options: [],
-            routeResponse: {}
+            routeResponse: {
+                routes: [
+                    {
+                        polyline: {
+                            encodedPolyline: ""
+                        }
+                    }
+                ]
+            }
         }
     } as LocalStorageTripData);
 
@@ -74,9 +83,16 @@ export default function ConfirmTrip() {
                     <h1>{tripData.destinationText}</h1>
                 </div>
 
-                <div className={styles.map}>
-
-                </div>
+                {
+                    tripData.data.routeResponse.routes[0].polyline.encodedPolyline ? (
+                        <MapComponent
+                            encodedPolyline={tripData.data.routeResponse.routes[0].polyline.encodedPolyline}
+                        />
+                    ) : (
+                        <>
+                        </>
+                    )
+                }
 
                 <div className={styles.chooseDriver}>
                     <div className={styles.line}></div>
@@ -87,10 +103,10 @@ export default function ConfirmTrip() {
                 {
                     tripData.data.options.map((driver) => {
                         return (
-                            <DriverOptionCard 
-                                key={driver.id} 
-                                driver ={driver}
-                                tripData={tripData} 
+                            <DriverOptionCard
+                                key={driver.id}
+                                driver={driver}
+                                tripData={tripData}
                             />
                         )
                     })
